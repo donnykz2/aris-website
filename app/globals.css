@@ -1,0 +1,229 @@
+@keyframes logo1-premium {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+    filter: blur(18px) brightness(1.2) drop-shadow(0 0 32px #fff8);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.04);
+    filter: blur(4px) brightness(1.08) drop-shadow(0 0 48px #fff8);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0) brightness(1) drop-shadow(0 0 32px #fff6);
+  }
+  90% {
+    opacity: 1;
+    transform: scale(1.01);
+    filter: blur(0) brightness(1) drop-shadow(0 0 16px #fff4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.08);
+    filter: blur(10px) brightness(1.08) drop-shadow(0 0 64px #fff2);
+  }
+}
+.animate-logo1-premium {
+  animation: logo1-premium 1.6s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+  z-index: 20;
+}
+
+@keyframes logo1-swipe {
+  0% {
+    opacity: 0;
+    left: 45%;
+    width: 0%;
+  }
+  10% {
+    opacity: 1;
+    left: 45%;
+    width: 0%;
+  }
+  35% {
+    opacity: 1;
+    left: 0%;
+    width: 60%;
+  }
+  65% {
+    opacity: 1;
+    left: 40%;
+    width: 60%;
+  }
+  90% {
+    opacity: 0.7;
+    left: 100%;
+    width: 0%;
+  }
+  100% {
+    opacity: 0;
+    left: 100%;
+    width: 0%;
+  }
+}
+.animate-logo1-swipe {
+  position: absolute;
+  top: 0; left: 0; height: 100%;
+  background: linear-gradient(90deg, transparent 0%, #fff 48%, #fff 52%, transparent 100%);
+  animation: logo1-swipe 1.35s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+  z-index: 15;
+  pointer-events: none;
+}
+@keyframes logo2-sexy {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) rotate(-8deg);
+    filter: blur(8px) brightness(1.2);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.08) rotate(2deg);
+    filter: blur(0) brightness(1.1);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: blur(0) brightness(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.12) rotate(-4deg);
+    filter: blur(6px) brightness(1.1);
+  }
+}
+.animate-logo2-sexy {
+  animation: logo2-sexy 1.1s cubic-bezier(0.22, 0.68, 0.18, 1) forwards;
+}
+/* Size chart glassy effect and glow */
+.size-chart-glass {
+  background: #0a0a0a;
+  border-radius: 1.2rem;
+  border: 1.5px solid rgba(255,255,255,0.08);
+  position: relative;
+  overflow: hidden;
+}
+.size-chart-glass::before {
+  display: none;
+}
+.size-chart-glass:hover {
+  border-color: rgba(255,255,255,0.16);
+}
+.size-chart-table th, .size-chart-table td {
+  padding: 0.55em 1.1em;
+  border-radius: 0.5em;
+  background: rgba(34,34,38,0.18);
+  transition: background 0.2s;
+}
+.size-chart-table tr:hover td {
+  background: rgba(255,255,255,0.08);
+}
+.size-chart-table th {
+  font-weight: 600;
+  color: #e5e5e5;
+  letter-spacing: 0.12em;
+}
+.size-chart-table td {
+  color: #d1d1d6;
+  font-size: 1em;
+}
+
+
+@keyframes fade-in-out {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-fade-in-out {
+  animation: fade-in-out 0.7s cubic-bezier(0.22, 0.68, 0.18, 1) forwards;
+}
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #f4f4f5;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  letter-spacing: 0.01em;
+  background-image: url("/model3.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+::selection {
+  background: rgba(244, 244, 245, 0.2);
+}
+
+@keyframes logo-reveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+    filter: blur(6px) brightness(1.04);
+  }
+  28% {
+    opacity: 1;
+    transform: scale(1.02);
+    filter: blur(0.8px) brightness(1);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0) brightness(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.04);
+    filter: blur(3px) brightness(1);
+  }
+}
+.animate-logo-reveal {
+  animation: logo-reveal 2.5s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+  z-index: 50;
+}
+
+.animate-soft-glow {
+  animation: soft-glow 2.6s ease-in-out infinite;
+}
+
+@keyframes logo-zoom {
+  0% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(14);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(18);
+  }
+}
+
+.animate-logo-zoom {
+  animation: logo-zoom 0.7s ease-in-out forwards;
+}

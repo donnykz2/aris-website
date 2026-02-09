@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function ResetPasswordPage() {
+function ResetPasswordInner() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
   const token = searchParams.get("token") || "";
@@ -55,5 +55,13 @@ export default function ResetPasswordPage() {
         {message && <div className="text-xs text-zinc-400 text-center mt-2">{message}</div>}
       </form>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense>
+      <ResetPasswordInner />
+    </Suspense>
   );
 }

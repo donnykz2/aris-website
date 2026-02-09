@@ -11,6 +11,10 @@ export default function LoginPrompt() {
   const [accessCode, setAccessCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showAccessCode, setShowAccessCode] = useState(false);
+  const [showReset, setShowReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetMessage, setResetMessage] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -26,7 +30,7 @@ export default function LoginPrompt() {
   };
 
   return (
-    <div className="mt-6 w-full rounded-2xl border border-white/10 bg-black/45 px-6 py-6 text-left">
+    <div className="mt-6 w-full rounded-2xl border border-white/10 bg-black/45 px-6 py-6 text-left relative">
       <p className="text-xs uppercase tracking-[0.35em] text-zinc-400">
         Access
       </p>
@@ -168,13 +172,75 @@ export default function LoginPrompt() {
           {state === "success" ? "Access granted" : "Log in"}
         </button>
 
-        <div className="mt-2 text-xs text-zinc-400 text-center cursor-pointer underline hover:text-zinc-200" tabIndex={0} role="button">
+        <div
+          className="mt-2 text-xs text-zinc-400 text-left cursor-pointer underline hover:text-zinc-200"
+          tabIndex={0}
+          role="button"
+          onClick={() => setShowReset(true)}
+        >
           Forgot password?
         </div>
 
         <div className="min-h-[18px] text-[10px] uppercase tracking-[0.3em] text-zinc-500" aria-live="polite">
           {state === "success" ? "Welcome back." : ""}
         </div>
+        {/* Password reset prompt */}
+        {showReset && (
+          <div className="absolute left-0 top-full mt-2 w-full rounded-xl bg-black/90 border border-white/10 p-4 z-10 shadow-xl flex flex-col gap-2">
+            <label htmlFor="reset-email" className="text-xs text-zinc-400">Enter your email to reset password:</label>
+            <input
+              id="reset-email"
+              type="email"
+              value={resetEmail}
+              onChange={e => setResetEmail(e.target.value)}
+              className="h-10 rounded-full border border-white/10 bg-black/60 px-4 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-zinc-200 focus:outline-none"
+              placeholder="Email address"
+              autoFocus
+            />
+            <div className="flex gap-2 mt-2">
+              <button
+                type="button"
+                className="flex-1 rounded-full border border-white/15 bg-zinc-800 text-xs font-medium uppercase tracking-[0.2em] text-zinc-200 py-2 hover:bg-zinc-700"
+                onClick={async () => {
+                  setResetLoading(true);
+                  setResetMessage("");
+                  try {
+                    const res = await fetch("/api/request-password-reset", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ email: resetEmail }),
+                    });
+                    if (res.ok) {
+                      setResetMessage("Password reset link sent! Check your email.");
+                    } else {
+                      setResetMessage("Could not send reset link. Please try again.");
+                    }
+                  } catch {
+                    setResetMessage("Could not send reset link. Please try again.");
+                  }
+                  setResetLoading(false);
+                }}
+                disabled={resetLoading || !resetEmail}
+              >
+                {resetLoading ? "Sending..." : "Send reset link"}
+              </button>
+              <button
+                type="button"
+                className="rounded-full border border-white/15 bg-transparent text-xs font-medium uppercase tracking-[0.2em] text-zinc-400 py-2 hover:text-zinc-200"
+                onClick={() => {
+                  setShowReset(false);
+                  setResetEmail("");
+                  setResetMessage("");
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+            {resetMessage && (
+              <div className="text-xs text-zinc-400 mt-1 text-center">{resetMessage}</div>
+            )}
+          </div>
+        )}
       </form>
     </div>
   );

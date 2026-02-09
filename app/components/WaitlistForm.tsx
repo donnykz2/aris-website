@@ -50,15 +50,15 @@ export default function WaitlistForm({ onAccessGranted }: WaitlistFormProps) {
 
     if (mode === "waitlist") {
       const generatedCode = generateAccessCode(email.trim().toLowerCase());
-      console.info("ARIS waitlist signup", { name, email, password, generatedCode });
+      console.info("ARIS waitlist signup", { name, email, generatedCode });
       try {
         const res = await fetch("/api/waitlist-signup", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            email,
+            to: email,
+            from: "arisclocontact@gmail.com", // correct sender email
             name,
-            password,
           }),
         });
         if (res.status === 409) {

@@ -32,6 +32,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { to, from, name } = req.body;
+  if (!to || typeof to !== 'string' || !to.includes('@')) {
+    console.error("Invalid or missing 'to' (email) field", req.body);
+    return res.status(400).json({ error: "Invalid or missing email address (to)" });
+  }
+  if (!from || typeof from !== 'string' || !from.includes('@')) {
+    console.error("Invalid or missing 'from' (sender) field", req.body);
+    return res.status(400).json({ error: "Invalid or missing sender email address (from)" });
+  }
   const accessCode = generateAccessCode(to.trim().toLowerCase());
 
   console.log("Received waitlist signup:", { to, from, name, accessCode });

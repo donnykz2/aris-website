@@ -1,37 +1,7 @@
-
-import type { Metadata } from "next";
-export const metadata: Metadata = {
-  title: 'AS-01 Cargo Shorts | ARIS Luxury Streetwear',
-  description: 'The AS-01 Cargo Shorts by ARIS — a premium streetwear essential crafted from luxury cotton twill. Above Standard.',
-  openGraph: {
-    title: 'AS-01 Cargo Shorts | ARIS Luxury Streetwear',
-    description: 'The AS-01 Cargo Shorts by ARIS — a premium streetwear essential crafted from luxury cotton twill. Above Standard.',
-    url: 'https://www.arisclo.co/shop/as-01-cargo-shorts',
-    type: 'website',
-    images: [
-      {
-        url: '/og.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'AS-01 Cargo Shorts by ARIS',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'AS-01 Cargo Shorts | ARIS Luxury Streetwear',
-    description: 'The AS-01 Cargo Shorts by ARIS — a premium streetwear essential crafted from luxury cotton twill. Above Standard.',
-    images: ['/og.jpg'],
-  },
-  alternates: {
-    canonical: 'https://www.arisclo.co/shop/as-01-cargo-shorts',
-  },
-};
+"use client";
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
 import { useOverlay } from "../../overlay-provider";
 import { useTransitionOverlay } from "../../transition-overlay-context";
 
@@ -47,27 +17,14 @@ function getLaunchDate(): Date {
 
 export default function ProductPage() {
   const router = useRouter();
-  const pathname = usePathname();
   const [fadeOut, setFadeOut] = useState(false);
   const [hideContent, setHideContent] = useState(false);
   const { overlayActive, setOverlayActive } = useTransitionOverlay();
-  const [backDisabled, setBackDisabled] = useState(false);
   const [readyToNavigate, setReadyToNavigate] = useState(false);
-
-  // Navigation effect: only triggers after all transitions are visually complete
-  useEffect(() => {
-    if (readyToNavigate) {
-      setOverlayActive(false); // Ensure overlay is off before navigation
-      // Use a microtask to guarantee overlay is gone before navigation
-      Promise.resolve().then(() => router.replace("/shop"));
-    }
-  }, [readyToNavigate, router, setOverlayActive]);
-
   const [isBeforeLaunch, setIsBeforeLaunch] = useState(true);
   const [selectedSize, setSelectedSize] = useState('S');
   const [quantity, setQuantity] = useState(1);
   const { trigger: triggerOverlay } = useOverlay();
-  const logoTimeout = useRef<NodeJS.Timeout | null>(null);
   const animating = useRef(false);
   const sizeChartData = [
     { size: 'S', waist: '72–80 cm / 28–31 in', hip: '98 cm / 38.6 in', thigh: '60 cm / 23.6 in', inseam: '76 cm / 29.9 in', outseam: '104 cm / 40.9 in' },
@@ -79,63 +36,59 @@ export default function ProductPage() {
   useEffect(() => {
     const launchDate = getLaunchDate();
     const update = () => setIsBeforeLaunch(Date.now() < launchDate.getTime());
-
     update();
     const timer = setInterval(update, 1000);
     return () => clearInterval(timer);
   }, []);
 
-
-
-  // Signal overlay state to context
   useEffect(() => {
-    if (pathname === "/shop/as-01-cargo-shorts" && (fadeOut || hideContent)) {
+    if (readyToNavigate) {
+      setOverlayActive(false);
+      Promise.resolve().then(() => router.replace("/shop"));
+    }
+  }, [readyToNavigate, router, setOverlayActive]);
+
+  useEffect(() => {
+    if (fadeOut || hideContent) {
       setOverlayActive(true);
     } else {
       setOverlayActive(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, fadeOut, hideContent]);
-
-  // Overlay is now rendered globally in layout
+  }, [fadeOut, hideContent, setOverlayActive]);
 
   return (
-    <div className="min-h-screen bg-black text-zinc-50 transition-opacity duration-400 opacity-100"> 
-
+    <div className="min-h-screen bg-black text-zinc-50 transition-opacity duration-400 opacity-100">
       <header className="flex items-center justify-between px-6 py-6 sm:px-10">
         <button
           className="text-xs uppercase tracking-[0.35em] text-zinc-400 transition-colors hover:text-zinc-100 focus:outline-none"
-          disabled={backDisabled}
-          style={backDisabled ? { opacity: 0.5, pointerEvents: 'none' } : {}}
           onClick={() => {
-            if (animating.current || backDisabled) return;
+            if (animating.current) return;
             animating.current = true;
-            setBackDisabled(true);
             setFadeOut(true);
-            // Wait for fade out
             setTimeout(() => {
-              setOverlayActive(false); // Hide overlay before navigation
-              setTimeout(() => {
+              setHideContent(true);
+              triggerOverlay(() => {
+                setHideContent(false);
+                setFadeOut(false);
                 router.replace("/shop");
-              }, 10); // Give overlay a frame to disappear
-            }, 400); // 400ms matches the fade duration
+                animating.current = false;
+              });
+            }, 400);
           }}
         >
           Back to shop
         </button>
       </header>
-
       <main className="px-6 pb-16 sm:px-10">
         <div className="grid gap-10 lg:grid-cols-2 items-start">
-          <div className="flex items-center justify-center h-[520px] sm:h-[680px] bg-black rounded-3xl border border-white/10 shadow-lg p-4">
+          <div className="flex items-center justify-center h-[420px] sm:h-[540px] bg-black rounded-3xl border border-white/10 shadow-lg p-4">
             <img
               src={PRODUCT_IMAGE}
               alt='ARIS "AS-01" Cargo Shorts'
               className="w-full h-full object-cover rounded-2xl border border-zinc-800 shadow-md"
             />
           </div>
-          <div className="flex flex-col justify-start min-h-[520px] sm:min-h-[680px]">
-            {/* Product Info and Size Chart */}
+          <div className="flex flex-col justify-start min-h-[420px] sm:min-h-[540px]">
             <p className="text-xs uppercase tracking-[0.4em] text-zinc-400 mb-2">
               001 Release
             </p>
@@ -143,10 +96,8 @@ export default function ProductPage() {
               ARIS- "AS-01" Cargo Shorts
             </h1>
             <p className="mt-6 text-sm leading-7 text-zinc-200/90 sm:text-base">
-              The AS-01 Cargo Shorts by ARIS are a premium streetwear essential. Crafted from luxury cotton twill, these shorts deliver structure and comfort with a refined, minimal finish. Above Standard.
+              The AS-01 Cargo Shorts by ARIS are modern luxury clothing. Crafted for comfort and utility, this piece is Above Standard — a refined essential for the elevated wardrobe.
             </p>
-
-            {/* Product JSON-LD Structured Data */}
             <script
               type="application/ld+json"
               dangerouslySetInnerHTML={{
@@ -154,7 +105,7 @@ export default function ProductPage() {
                   '@context': 'https://schema.org',
                   '@type': 'Product',
                   name: 'AS-01 Cargo Shorts',
-                  description: 'The AS-01 Cargo Shorts by ARIS — a premium streetwear essential crafted from luxury cotton twill. Above Standard.',
+                  description: 'The AS-01 Cargo Shorts by ARIS — modern luxury clothing, crafted for comfort and utility. Above Standard.',
                   image: [PRODUCT_IMAGE],
                   brand: {
                     '@type': 'Brand',
@@ -170,118 +121,103 @@ export default function ProductPage() {
                 }),
               }}
             />
-
-            <div className="mt-10 rounded-2xl border border-white/10 bg-black/40 px-6 py-5">
+            <div className="mt-8 rounded-2xl border border-white/10 bg-black/40 px-6 py-5">
               <div className="flex items-center justify-between text-xs uppercase tracking-[0.32em] text-zinc-400">
                 <span>Purchase Price</span>
-                <span
-                  className={
-                    isBeforeLaunch ? "text-zinc-400" : "line-through text-zinc-500"
-                  }
-                >
+                <span className={isBeforeLaunch ? "text-zinc-400" : "line-through text-zinc-500"}>
                   $139 AUD
                 </span>
               </div>
               <div className="mt-2 flex items-center justify-between text-xs uppercase tracking-[0.32em] text-zinc-400">
                 <span>Retail</span>
-                <span
-                  className={
-                    isBeforeLaunch ? "line-through text-zinc-500" : "text-zinc-400"
-                  }
-                >
+                <span className={isBeforeLaunch ? "line-through text-zinc-500" : "text-zinc-400"}>
                   $179 AUD
                 </span>
               </div>
             </div>
-
-            <div className="mt-10 grid gap-6 sm:grid-cols-2">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
               <div className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4">
                 <p className="text-xs uppercase tracking-[0.35em] text-zinc-100 font-semibold mb-1">Fabric</p>
                 <p className="mt-2 text-sm text-zinc-200/90">
-                  Crafted from 450 GSM cotton twill, the fabric offers a substantial hand and refined drape. Its soft, matte finish speaks to a quiet confidence—luxurious yet understated, designed for enduring comfort and presence.
+                  Premium cotton blend, lightweight yet durable, designed for all-day comfort and movement.
                 </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4">
                 <p className="text-xs uppercase tracking-[0.35em] text-zinc-100 font-semibold mb-1">Details</p>
                 <p className="mt-2 text-sm text-zinc-200/90">
-                  Integrated adjustable belt system with tonal hardware, featuring an intentional 30 cm extended belt hang. The shorts are finished with reinforced seams and cut-and-sewn construction—each detail considered for lasting structure and quiet distinction.
+                  Multiple cargo pockets, reinforced stitching, adjustable waistband, and a modern relaxed fit.
                 </p>
               </div>
             </div>
-
-              {/* Size Chart Section */}
-                <div className="mt-12 size-chart-glass px-6 py-6">
-                  {/* Size Selector */}
-                  <div className="mb-7 flex gap-3">
-                    {['S','M','L','XL'].map((size) => (
-                      <button
-                        key={size}
-                        className={`px-4 py-2 rounded-full border border-white/15 bg-black text-zinc-50 text-sm font-semibold uppercase tracking-widest transition-colors duration-150 ${selectedSize === size ? 'bg-zinc-50 text-zinc-900 border-zinc-50 shadow-md' : 'hover:bg-zinc-900 hover:text-zinc-100'}`}
-                        onClick={() => setSelectedSize(size)}
-                      >
-                        {size}
-                      </button>
+            <div className="mt-10 size-chart-glass px-6 py-6">
+              <div className="mb-6 flex gap-3">
+                {['S','M','L','XL'].map((size) => (
+                  <button
+                    key={size}
+                    className={`px-4 py-2 rounded-full border border-white/15 bg-black text-zinc-50 text-sm font-semibold uppercase tracking-widest transition-colors duration-150 ${selectedSize === size ? 'bg-zinc-50 text-zinc-900 border-zinc-50 shadow-md' : 'hover:bg-zinc-900 hover:text-zinc-100'}`}
+                    onClick={() => setSelectedSize(size)}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+              <div className="mb-6 flex items-center gap-4">
+                <span className="text-xs uppercase tracking-[0.2em] text-zinc-400">Quantity</span>
+                <button
+                  className="w-8 h-8 flex items-center justify-center rounded-full border border-white/15 bg-black text-zinc-50 text-lg font-bold transition-colors hover:bg-zinc-900"
+                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                >
+                  -
+                </button>
+                <span className="w-8 text-center text-zinc-50 text-base font-semibold select-none">{quantity}</span>
+                <button
+                  className="w-8 h-8 flex items-center justify-center rounded-full border border-white/15 bg-black text-zinc-50 text-lg font-bold transition-colors hover:bg-zinc-900"
+                  onClick={() => setQuantity(q => q + 1)}
+                >
+                  +
+                </button>
+              </div>
+              <p className="text-xs uppercase tracking-[0.35em] text-zinc-100 font-semibold mb-4">
+                <span className="text-zinc-50 font-semibold text-base mr-2">Size Chart</span>
+                <span className="text-zinc-500 text-[11px]">(cm / inch)</span>
+              </p>
+              <div className="overflow-x-auto">
+                <table className="w-full size-chart-table border-separate border-spacing-y-2">
+                  <thead>
+                    <tr className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+                      <th className="text-left">Size</th>
+                      <th className="text-left">Waist</th>
+                      <th className="text-left">Hip</th>
+                      <th className="text-left">Thigh</th>
+                      <th className="text-left">Inseam</th>
+                      <th className="text-left">Outseam</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sizeChartData.filter(row => row.size === selectedSize).map(row => (
+                      <tr key={row.size} className="bg-zinc-900/60">
+                        <td>{row.size}</td>
+                        <td>{row.waist}</td>
+                        <td>{row.hip}</td>
+                        <td>{row.thigh}</td>
+                        <td>{row.inseam}</td>
+                        <td>{row.outseam}</td>
+                      </tr>
                     ))}
-                  </div>
-                  {/* Quantity Selector */}
-                  <div className="mb-7 flex items-center gap-4">
-                    <span className="text-xs uppercase tracking-[0.2em] text-zinc-400">Quantity</span>
-                    <button
-                      className="w-8 h-8 flex items-center justify-center rounded-full border border-white/15 bg-black text-zinc-50 text-lg font-bold transition-colors hover:bg-zinc-900"
-                      onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                    >
-                      -
-                    </button>
-                    <span className="w-8 text-center text-zinc-50 text-base font-semibold select-none">{quantity}</span>
-                    <button
-                      className="w-8 h-8 flex items-center justify-center rounded-full border border-white/15 bg-black text-zinc-50 text-lg font-bold transition-colors hover:bg-zinc-900"
-                      onClick={() => setQuantity(q => q + 1)}
-                    >
-                      +
-                    </button>
-                  </div>
-                  <p className="text-xs uppercase tracking-[0.35em] text-zinc-100 font-semibold mb-4">
-                    <span className="text-zinc-50 font-semibold text-base mr-2">Size Chart</span>
-                    <span className="text-zinc-500 text-[11px]">(cm / inch)</span>
-                  </p>
-                  <div className="overflow-x-auto">
-                    <table className="w-full size-chart-table border-separate border-spacing-y-2">
-                      <thead>
-                        <tr className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-                          <th className="text-left">Size</th>
-                          <th className="text-left">Waist</th>
-                          <th className="text-left">Hip</th>
-                          <th className="text-left">Thigh</th>
-                          <th className="text-left">Inseam</th>
-                          <th className="text-left">Outseam</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {sizeChartData.filter(row => row.size === selectedSize).map(row => (
-                          <tr key={row.size} className="bg-zinc-900/60">
-                            <td>{row.size}</td>
-                            <td>{row.waist}</td>
-                            <td>{row.hip}</td>
-                            <td>{row.thigh}</td>
-                            <td>{row.inseam}</td>
-                            <td>{row.outseam}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <p className="mt-5 text-xs text-zinc-200/90 font-medium">
-                    Relaxed straight fit <span className="text-zinc-400">with adjustable waist tabs for a flexible, secure fit.</span>
-                  </p>
-                </div>
-
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-4 text-xs text-zinc-200/90 font-medium">
+                Designed for a relaxed, functional fit.<br />
+                Take your usual size for intended fit, or size up for a looser silhouette.
+              </p>
+            </div>
             <button className="mt-8 h-12 w-full rounded-full border border-white/15 bg-zinc-50 text-sm font-medium uppercase tracking-[0.25em] text-zinc-950 transition-opacity hover:opacity-90">
               Purchase
             </button>
           </div>
         </div>
       </main>
-      {/* Overlay handled globally */}
     </div>
   );
 }

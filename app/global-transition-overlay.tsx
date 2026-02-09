@@ -5,7 +5,18 @@ export default function GlobalTransitionOverlay() {
   const { overlayActive } = useTransitionOverlay();
   if (!overlayActive) return null;
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black z-[9999]">
+    <div
+      className="fixed inset-0 flex items-center justify-center bg-black z-[9999]"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        width: '100vw',
+        background: '#000',
+        zIndex: 9999,
+      }}
+    >
       <img
         src="/logo1new.png"
         alt="Aris Logo"

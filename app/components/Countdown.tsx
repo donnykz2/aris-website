@@ -72,11 +72,11 @@ export default function Countdown() {
       ];
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/40 px-8 py-10">
-      <div className="grid grid-cols-2 gap-6 text-left sm:grid-cols-4">
+    <div className="rounded-2xl border border-white/10 bg-black/40 px-6 py-8">
+      <div className="grid grid-cols-2 gap-8 text-left sm:grid-cols-4 sm:gap-6">
         {segments.map((segment) => (
-          <div key={segment.label} className="flex flex-col">
-            <span className="text-3xl font-semibold tabular-nums text-zinc-50 sm:text-4xl">
+          <div key={segment.label} className="flex flex-col items-center">
+            <span className="text-2xl font-semibold tabular-nums text-zinc-50 sm:text-4xl">
               {segment.value.toString().padStart(2, "0")}
             </span>
             <span className="mt-2 text-xs uppercase tracking-[0.35em] text-zinc-500">

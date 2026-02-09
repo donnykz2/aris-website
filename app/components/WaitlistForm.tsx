@@ -39,40 +39,90 @@ export default function WaitlistForm({ onAccessGranted }: WaitlistFormProps) {
     if (
       !email ||
       (mode === "waitlist" && !password) ||
-      (mode === "login" && !accessCode)
+      (mode === "login" && (!password || !accessCode))
     ) {
       return;
     }
 
     setState("submitting");
 
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    // Removed artificial delay for faster signup
 
     if (mode === "waitlist") {
       const generatedCode = generateAccessCode(email.trim().toLowerCase());
       console.info("ARIS waitlist signup", { name, email, password, generatedCode });
-      setMessage(`Your access code: ${generatedCode}`);
-      setState("success");
-      onAccessGranted?.();
-      return;
-    }
-
-    const expectedCode = generateAccessCode(email.trim().toLowerCase());
-    console.info("ARIS login attempt", { email, accessCode });
-
-    if (accessCode.trim().toUpperCase() !== expectedCode) {
-      setMessage("Invalid access code.");
+      try {
+        const res = await fetch("/api/waitlist-signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            name,
+            password,
+          }),
+        });
+        if (res.status === 409) {
+          setMessage("This email is already registered. Please log in or use a different email.");
+          setState("idle");
+          return;
+        }
+        if (res.status === 400) {
+          setMessage("Please enter a valid email address.");
+          setState("idle");
+          return;
+        }
+        if (!res.ok) {
+          setMessage("Something went wrong. Please try again.");
+          setState("idle");
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to send waitlist signup email", err);
+        setMessage("Something went wrong. Please try again.");
+        setState("idle");
+        return;
+      }
+      setMessage("You’ve successfully joined the waitlist. You’ll receive your early access code by email before launch.");
       setState("idle");
       return;
     }
 
-    setMessage("");
-    setState("success");
-    onAccessGranted?.();
+    if (mode === "login") {
+      // Authenticate user password
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        setMessage("Incorrect password.");
+        setState("idle");
+        return;
+      }
+      // Check access code
+      const expectedCode = generateAccessCode(email.trim().toLowerCase());
+      if (accessCode.trim().toUpperCase() !== expectedCode) {
+        setMessage("Invalid access code.");
+        setState("idle");
+        return;
+      }
+      setMessage("");
+      setState("success");
+      onAccessGranted?.();
+    }
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/40 px-8 py-10">
+    <div
+      className="rounded-2xl border border-white/10 px-8 py-10"
+      style={{
+        background: 'rgba(10,10,10,0.85)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        boxShadow: '0 4px 32px rgba(0,0,0,0.18)',
+      }}
+    >
       <div className="flex items-center justify-center gap-4">
         <p className="text-sm uppercase tracking-[0.35em] text-zinc-500">
           {mode === "waitlist" ? "Waitlist" : "Access"}
@@ -93,7 +143,12 @@ export default function WaitlistForm({ onAccessGranted }: WaitlistFormProps) {
               placeholder="Name (optional)"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              className="h-12 rounded-full border border-white/10 bg-black/60 px-5 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-zinc-300 focus:outline-none"
+              className="h-12 rounded-full border border-white/10 px-5 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-zinc-300 focus:outline-none"
+              style={{
+                background: 'rgba(10,10,10,0.85)',
+                color: '#fff',
+                WebkitAppearance: 'none',
+              }}
             />
           </>
         )}
@@ -110,7 +165,12 @@ export default function WaitlistForm({ onAccessGranted }: WaitlistFormProps) {
           placeholder="Email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="h-12 rounded-full border border-white/10 bg-black/60 px-5 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-zinc-300 focus:outline-none"
+          className="h-12 rounded-full border border-white/10 px-5 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-zinc-300 focus:outline-none"
+          style={{
+            background: 'rgba(10,10,10,0.85)',
+            color: '#fff',
+            WebkitAppearance: 'none',
+          }}
         />
 
         {mode === "waitlist" && (
@@ -176,10 +236,67 @@ export default function WaitlistForm({ onAccessGranted }: WaitlistFormProps) {
 
         {mode === "login" && (
           <>
+            <label className="sr-only" htmlFor="login-password">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                id="login-password"
+                name="login-password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                placeholder="Password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                className="h-12 w-full rounded-full border border-white/10 bg-black/60 px-5 pr-12 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-zinc-300 focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 transition-colors hover:text-zinc-200"
+              >
+                {showPassword ? (
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M3 3l18 18" />
+                    <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8" />
+                    <path d="M9.5 5.2A9.7 9.7 0 0 1 12 5c7 0 10 7 10 7a18.6 18.6 0 0 1-3.5 4.3" />
+                    <path d="M6.4 6.4C3.7 8 2 12 2 12a17.2 17.2 0 0 0 5.2 6.1A9.6 9.6 0 0 0 12 19c1.2 0 2.3-.2 3.4-.6" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            </div>
+
             <label className="sr-only" htmlFor="access-code">
               Access code
             </label>
-            <div className="relative">
+            <div className="relative mt-4">
               <input
                 id="access-code"
                 name="access-code"

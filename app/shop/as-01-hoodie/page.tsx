@@ -1,4 +1,32 @@
-"use client";
+
+import type { Metadata } from "next";
+export const metadata: Metadata = {
+  title: 'AS-01 Hoodie | ARIS Luxury Streetwear',
+  description: 'The AS-01 Hoodie by ARIS — modern luxury clothing, crafted for comfort and presence. Above Standard.',
+  openGraph: {
+    title: 'AS-01 Hoodie | ARIS Luxury Streetwear',
+    description: 'The AS-01 Hoodie by ARIS — modern luxury clothing, crafted for comfort and presence. Above Standard.',
+    url: 'https://www.arisclo.co/shop/as-01-hoodie',
+    type: 'website',
+    images: [
+      {
+        url: '/og.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'AS-01 Hoodie by ARIS',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AS-01 Hoodie | ARIS Luxury Streetwear',
+    description: 'The AS-01 Hoodie by ARIS — modern luxury clothing, crafted for comfort and presence. Above Standard.',
+    images: ['/og.jpg'],
+  },
+  alternates: {
+    canonical: 'https://www.arisclo.co/shop/as-01-hoodie',
+  },
+};
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -78,8 +106,33 @@ export default function HoodiePage() {
               ARIS “AS-01” Hoodie
             </h1>
             <p className="mt-6 text-sm leading-7 text-zinc-200/90 sm:text-base">
-              A substantial, luxury hoodie crafted for comfort and presence. The 450 GSM cotton twill delivers a refined drape and quiet confidence, while the integrated adjustable belt and reinforced seams ensure lasting structure and subtle distinction.
+              The AS-01 Hoodie by ARIS is modern luxury clothing. Crafted for comfort and presence, this piece is Above Standard — a refined essential for the elevated wardrobe.
             </p>
+
+            {/* Product JSON-LD Structured Data */}
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  '@context': 'https://schema.org',
+                  '@type': 'Product',
+                  name: 'AS-01 Hoodie',
+                  description: 'The AS-01 Hoodie by ARIS — modern luxury clothing, crafted for comfort and presence. Above Standard.',
+                  image: [PRODUCT_IMAGE],
+                  brand: {
+                    '@type': 'Brand',
+                    name: 'ARIS',
+                  },
+                  offers: {
+                    '@type': 'Offer',
+                    priceCurrency: 'AUD',
+                    price: '189',
+                    availability: 'https://schema.org/InStock',
+                    url: 'https://www.arisclo.co/shop/as-01-hoodie',
+                  },
+                }),
+              }}
+            />
             <div className="mt-8 rounded-2xl border border-white/10 bg-black/40 px-6 py-5">
               <div className="flex items-center justify-between text-xs uppercase tracking-[0.32em] text-zinc-400">
                 <span>Purchase Price</span>

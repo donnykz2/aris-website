@@ -1,0 +1,29 @@
+// Prisma schema for secure user accounts
+// Run `npx prisma migrate dev` after editing
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  password  String   // Store hashed password only
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Waitlist {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  accessCode String
+  notified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

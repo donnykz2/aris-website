@@ -1,4 +1,32 @@
-"use client";
+
+import type { Metadata } from "next";
+export const metadata: Metadata = {
+  title: 'AS-01 Cargo Shorts | ARIS Luxury Streetwear',
+  description: 'The AS-01 Cargo Shorts by ARIS — a premium streetwear essential crafted from luxury cotton twill. Above Standard.',
+  openGraph: {
+    title: 'AS-01 Cargo Shorts | ARIS Luxury Streetwear',
+    description: 'The AS-01 Cargo Shorts by ARIS — a premium streetwear essential crafted from luxury cotton twill. Above Standard.',
+    url: 'https://www.arisclo.co/shop/as-01-cargo-shorts',
+    type: 'website',
+    images: [
+      {
+        url: '/og.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'AS-01 Cargo Shorts by ARIS',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AS-01 Cargo Shorts | ARIS Luxury Streetwear',
+    description: 'The AS-01 Cargo Shorts by ARIS — a premium streetwear essential crafted from luxury cotton twill. Above Standard.',
+    images: ['/og.jpg'],
+  },
+  alternates: {
+    canonical: 'https://www.arisclo.co/shop/as-01-cargo-shorts',
+  },
+};
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -115,9 +143,33 @@ export default function ProductPage() {
               ARIS- "AS-01" Cargo Shorts
             </h1>
             <p className="mt-6 text-sm leading-7 text-zinc-200/90 sm:text-base">
-              A disciplined cargo short built with a tailored rise, engineered pockets, and
-              crisp structure. Designed for movement with a refined, minimal finish.
+              The AS-01 Cargo Shorts by ARIS are a premium streetwear essential. Crafted from luxury cotton twill, these shorts deliver structure and comfort with a refined, minimal finish. Above Standard.
             </p>
+
+            {/* Product JSON-LD Structured Data */}
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  '@context': 'https://schema.org',
+                  '@type': 'Product',
+                  name: 'AS-01 Cargo Shorts',
+                  description: 'The AS-01 Cargo Shorts by ARIS — a premium streetwear essential crafted from luxury cotton twill. Above Standard.',
+                  image: [PRODUCT_IMAGE],
+                  brand: {
+                    '@type': 'Brand',
+                    name: 'ARIS',
+                  },
+                  offers: {
+                    '@type': 'Offer',
+                    priceCurrency: 'AUD',
+                    price: '139',
+                    availability: 'https://schema.org/InStock',
+                    url: 'https://www.arisclo.co/shop/as-01-cargo-shorts',
+                  },
+                }),
+              }}
+            />
 
             <div className="mt-10 rounded-2xl border border-white/10 bg-black/40 px-6 py-5">
               <div className="flex items-center justify-between text-xs uppercase tracking-[0.32em] text-zinc-400">
